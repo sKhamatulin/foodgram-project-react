@@ -33,3 +33,35 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='follower',
+        verbose_name='follower',
+        on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        User,
+        related_name='following',
+        verbose_name='Author',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f'Author: {self.author}, follower: {self.user}'
+
+    def save(self, **kwargs):
+        if self.user == self.author:
+            raise ValidationError('Dont\'t follow yourself!')
+        super().save()
+
+    class Meta:
+        verbose_name = 'Follow'
+        verbose_name_plural = 'Follows'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'user'],
+                name='unique_follower')
+        ]
