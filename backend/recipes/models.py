@@ -69,7 +69,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ingredientes',
-        through='RecipeIngredient',
+        through='IngredInRecipe',
         related_name='recipe'
     )
     tags = models.ManyToManyField(
@@ -92,3 +92,88 @@ class Recipe(models.Model):
 
     def __str__(self):
         return f'{self.name[:LINE_SLICE]}'
+
+
+class IngredInRecipe(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Recipe',
+        related_name='recipe_ingredient'
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        verbose_name='Ingredient',
+    )
+    amount = models.PositiveSmallIntegerField(
+        verbose_name='Amount'
+    )
+
+    class Meta:
+        verbose_name = 'Amount of Ingredient'
+        verbose_name_plural = 'Amount of Ingredients'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique ingredient for recipe'
+            )
+        ]
+
+    def __str__(self):
+        return (f'{self.recipe}: {self.ingredient.name},'
+                f' {self.amount}, {self.ingredient.measurement_unit}')
+
+
+class Favorite(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Recipes',
+        related_name='favorite',
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='User',
+        related_name='favorite',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = 'Favorite Recipe'
+        verbose_name_plural = 'Favorite Recipes'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique favorite'),
+        )
+
+    def __str__(self):
+        return f'{self.recipe} is in {self.user} favorite list'
+
+
+class ShoppingList(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Recipes',
+        related_name='shopping_list',
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='User',
+        related_name='shopping_list',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = 'Recipe in cart'
+        verbose_name_plural = 'Recipes in cart'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique recipe in shoplist'),
+        )
+
+    def __str__(self):
+        return f'{self.recipe} is in the {self.user} cart'
