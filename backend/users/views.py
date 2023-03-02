@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -6,18 +7,17 @@ from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.permissions import IsAuthorOrReadOnly
+# from api.permissions import IsAuthorOrReadOnly
 from api.paginations import LimitPagination
-from .serializers import UsersSerializer
-from users.models import Follow, User
+from .serializers import CustomUsersSerializer, FollowSerializer
+from users.models import Follow
+
+User = get_user_model()
 
 
 class UsersViewSet(UserViewSet):
-    """Вьюсет для работы с пользователями и подписками.
-    Обработка запросов на создание/получение пользователей и
-    создание/получение/удаления подписок."""
     queryset = User.objects.all()
-    serializer_class = UsersSerializer
+    serializer_class = CustomUsersSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = LimitPagination
     http_method_names = ['get', 'post', 'delete', 'head']
@@ -37,10 +37,11 @@ class UsersViewSet(UserViewSet):
 
         if request.method == 'POST':
             if subscription.exists():
-                return Response({'error': 'Вы уже подписаны'},
+                return Response({'error': 'You have already subscribed'},
                                 status=status.HTTP_400_BAD_REQUEST)
             if user == author:
-                return Response({'error': 'Невозможно подписаться на себя'},
+                return Response({'error': 'It is impossible to subscribe '
+                                 'to yourself'},
                                 status=status.HTTP_400_BAD_REQUEST)
             serializer = FollowSerializer(author, context={'request': request})
             Follow.objects.create(user=user, author=author)
@@ -50,5 +51,5 @@ class UsersViewSet(UserViewSet):
             if subscription.exists():
                 subscription.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response({'error': 'Вы не подписаны на этого пользователя'},
+            return Response({'error': 'You are not subscribed to this user'},
                             status=status.HTTP_400_BAD_REQUEST)

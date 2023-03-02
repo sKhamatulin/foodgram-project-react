@@ -1,67 +1,42 @@
 from django.contrib.auth.models import AbstractUser
+# from django.contrib.auth import get_user_model
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from rest_framework.exceptions import ValidationError
+
+# User = get_user_model()
 
 
-class User(AbstractUser):
-    email = models.EmailField(
-        verbose_name='Email',
-        unique=True,
-        max_length=254
-    )
-    first_name = models.CharField(
-        verbose_name='Name',
-        max_length=150,
-    )
-    last_name = models.CharField(
-        verbose_name='LastName',
-        max_length=150,
-    )
+class CustomUser(AbstractUser):
+    email = models.EmailField(max_length=254, unique=True,
+                              verbose_name='Email')
+    user_name = models.CharField(max_length=150, unique=True,
+                                 validators=[UnicodeUsernameValidator],
+                                 verbose_name='User name')
+    first_name = models.CharField(max_length=150,
+                                  verbose_name='Name')
+    last_name = models.CharField(max_length=150,
+                                 verbose_name='Last name')
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
-
-    class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
-        constraints = [
-            models.UniqueConstraint(
-                fields=('username', 'email'),
-                name='unique_user'
-            )
-        ]
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     def __str__(self):
-        return self.username
+        return self.email
 
 
 class Follow(models.Model):
-    user = models.ForeignKey(
-        User,
-        related_name='follower',
-        verbose_name='follower',
-        on_delete=models.CASCADE
-    )
-    author = models.ForeignKey(
-        User,
-        related_name='following',
-        verbose_name='Author',
-        on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return f'Author: {self.author}, follower: {self.user}'
-
-    def save(self, **kwargs):
-        if self.user == self.author:
-            raise ValidationError('Dont\'t follow yourself!')
-        super().save()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+                             related_name='follower')
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+                               related_name='following')
 
     class Meta:
-        verbose_name = 'Follow'
-        verbose_name_plural = 'Follows'
+        verbose_name = 'Subscription'
+        verbose_name_plural = 'Subscriptions'
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'user'],
-                name='unique_follower')
-        ]
+                fields=['user', 'author'],
+                name='unique_followings')]
+
+    def __str__(self):
+        return f'{self.user} follow to {self.author}'
