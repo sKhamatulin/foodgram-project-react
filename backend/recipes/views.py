@@ -1,27 +1,24 @@
+from api.filters import IngredFilter, RecipeFilter
+from api.paginations import LimitPagination
+from api.permissions import IsAuthorOrReadOnly
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-# from reportlab.lib import colors
-# from reportlab.pdfbase import pdfmetrics
-# from reportlab.pdfbase.ttfonts import TTFont
-# from reportlab.pdfgen import canvas
-from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-# from .custom_mixins import RetrieveListViewSet
-from api.filters import IngredFilter, RecipeFilter
 from .models import (Favorite, Ingredient, IngredInRecipe, Recipe,
                      ShoppingList, Tag)
-from api.paginations import LimitPagination
-from api.permissions import IsAuthorOrReadOnly
-from .serializers import (FavoriteSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeInFollowListSerializer,
-                          ShoppingListSerializer, TagSerializer, GetRecipeSerializer)
+from .serializers import (FavoriteSerializer, GetRecipeSerializer,
+                          IngredientSerializer, RecipeCreateSerializer,
+                          ShoppingListSerializer, TagSerializer)
 
 
-class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+class IngredientViewSet(mixins.RetrieveModelMixin,
+                        mixins.ListModelMixin,
+                        viewsets.GenericViewSet):
     """
     ViewSet for  get ingredients.
     """
@@ -29,17 +26,19 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredFilter
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
     pagination_class = None
 
 
-class TagViewSet(viewsets.ReadOnlyModelViewSet):
+class TagViewSet(mixins.RetrieveModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
     """
     ViewSet for get tags.
     """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
     pagination_class = None
 
 
@@ -126,11 +125,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             measurement_unit = ingredient.ingredient__measurement_unit
             amount = ingredient.amount
             if name not in shopping_list:
-                shopping_list[name] = {
-                    'measurement_unit': measurement_unit,
-                    'amount': amount
-                }
+                shopping_list[name] = {'amount': amount,
+                                       'measurement_unit': measurement_unit}
             else:
                 shopping_list[name]['amount'] += amount
-        
-        return shopping_list
+
+        text = '\n'.join([
+            f'{_["name"]} {_["amount"]} = {_["measurement_unit"]}'
+            for _ in shopping_list])
+        filname = 'shoplist.txt'
+        response = HttpResponse(text, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename={filname}'
+
+        return response

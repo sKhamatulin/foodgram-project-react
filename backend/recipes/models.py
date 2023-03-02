@@ -41,7 +41,7 @@ class Ingredient(models.Model):
         verbose_name_plural = 'Ingredientes'
 
     def __str__(self):
-        return f'{self.measurement_unit}, {self.name}'
+        return f'{self.name} --- {self.measurement_unit}'
 
 
 class Recipe(models.Model):
