@@ -6,9 +6,9 @@ from django.db import models
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=254, unique=True,
                               verbose_name='Email')
-    user_name = models.CharField(max_length=150, unique=True,
-                                 validators=[UnicodeUsernameValidator],
-                                 verbose_name='User name')
+    username = models.CharField(max_length=150, unique=True,
+                                validators=[UnicodeUsernameValidator],
+                                verbose_name='User name')
     first_name = models.CharField(max_length=150,
                                   verbose_name='Name')
     last_name = models.CharField(max_length=150,

@@ -64,12 +64,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(methods=['get', 'delete'], detail=True,
+    @action(methods=['post', 'delete'], detail=True,
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, pk=None):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        if request.method == 'GET':
+        if request.method == 'POST':
             if Favorite.objects.filter(user=user, recipe=recipe).exists():
                 data = {'errors': 'Not the unique recipe'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
@@ -84,20 +84,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Favorite.objects.filter(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['get', 'delete'], detail=True,
+    @action(methods=['post', 'delete'], detail=True,
             permission_classes=(IsAuthenticated,))
-    def shoplist(self, request, pk=None):
+    def shopping_cart(self, request, pk=None):
         user = request.user
         recipe = get_object_or_404(Recipe, pk=pk)
-        if request.method == 'GET':
+        if request.method == 'POST':
             if ShoppingList.objects.filter(user=user, recipe=recipe).exists():
                 data = {'errors': 'Not the unique recipe'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-            shoplist = ShoppingList.objects.create(
-                user=user, recipe=recipe)
-            serializer = ShoppingListSerializer(
-                shoplist, context={'request': request}
-            )
+            shoplist = ShoppingList.objects.create(user=user, recipe=recipe)
+            serializer = ShoppingListSerializer(shoplist,
+                                                context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         shoplist = ShoppingList.objects.filter(
             user=user, recipe=recipe
@@ -115,7 +113,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         shopping_list = {}
         ingredients = IngredInRecipe.objects.filter(
-            recipe__cart__user=user).values_list(
+            recipe__list__user=user).values_list(
                 'ingredient__name',
                 'amount',
                 'ingredient__measurement_unit',
@@ -129,10 +127,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                        'measurement_unit': measurement_unit}
             else:
                 shopping_list[name]['amount'] += amount
-
         text = '\n'.join([
-            f'{_["name"]} {_["amount"]} = {_["measurement_unit"]}'
-            for _ in shopping_list])
+            f"{key} {str(value['amount'])} - {value['measurement_unit']} "
+            for key, value in shopping_list.items()])
         filname = 'shoplist.txt'
         response = HttpResponse(text, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filname}'

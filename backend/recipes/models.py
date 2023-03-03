@@ -48,20 +48,19 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name='Автор',)
+        verbose_name='Author',)
     name = models.CharField(
         verbose_name='Name',
         max_length=200,)
     image = models.ImageField(
         verbose_name='Image',
-        upload_to='recipes/media/',)
+        upload_to='back_media/recipes/media/',)
     text = models.TextField(
         verbose_name='Discription',)
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ingredientes',
-        through='IngredInRecipe',
-        related_name='recipe',)
+        through='IngredInRecipe',)
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Tags',
@@ -112,12 +111,11 @@ class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Recipes',
-        related_name='favorite',
+        related_name='favorite_recipe',
         on_delete=models.CASCADE,)
     user = models.ForeignKey(
         User,
         verbose_name='User',
-        related_name='how_favorite',
         on_delete=models.CASCADE,)
 
     class Meta:
@@ -137,12 +135,11 @@ class ShoppingList(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Recipes',
-        related_name='shopping_list',
+        related_name='list',
         on_delete=models.CASCADE,)
     user = models.ForeignKey(
         User,
         verbose_name='User',
-        related_name='how_shopping_list',
         on_delete=models.CASCADE,)
 
     class Meta:
