@@ -9,7 +9,9 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 from users.models import Follow
 
-from .serializers import CustomUsersSerializer, FollowSerializer
+from .serializers import CustomUsersSerializer
+from recipes.serializers import FollowSerializer
+
 
 User = get_user_model()
 
