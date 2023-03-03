@@ -54,7 +54,7 @@ class Recipe(models.Model):
         max_length=200,)
     image = models.ImageField(
         verbose_name='Image',
-        upload_to='back_media/recipes/media/',)
+        upload_to='recipes/media/',)
     text = models.TextField(
         verbose_name='Discription',)
     ingredients = models.ManyToManyField(
