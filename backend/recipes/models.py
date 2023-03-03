@@ -1,6 +1,5 @@
-from django.db import models
-
 from django.contrib.auth import get_user_model
+from django.db import models
 
 LINE_SLICE = 50
 User = get_user_model()
@@ -86,8 +85,7 @@ class IngredInRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Recipe',
-        related_name='recipe_ingredient',)
+        verbose_name='Recipe',)
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -100,7 +98,7 @@ class IngredInRecipe(models.Model):
         verbose_name_plural = 'Amount of Ingredients'
         constraints = [
             models.UniqueConstraint(
-                fields=('recipe', 'ingredient'),
+                fields=('ingredient', 'recipe',),
                 name='unique ingredient for recipe'
             )
         ]

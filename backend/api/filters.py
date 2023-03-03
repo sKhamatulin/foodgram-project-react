@@ -29,7 +29,7 @@ class RecipeFilter(filters.FilterSet):
         if value:
             return Recipe.objects.filter(shoplist__user=self.request.user)
         return Recipe.objects.all()
-    
+
 
 class IngredFilter(filters.FilterSet):
     """
