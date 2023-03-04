@@ -49,7 +49,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     choose the serializer class,
     create a new recipe
     add to favorite list
-    add to shop list
+    add to shop list.
     """
     queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend,)
