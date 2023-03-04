@@ -1,13 +1,20 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
+from django.core import exceptions
+
+
+def validate_me(value):
+    if value == 'me':
+        raise exceptions.ValidationError('the username can\'t be --me')
 
 
 class CustomUser(AbstractUser):
     email = models.EmailField(max_length=254, unique=True,
                               verbose_name='Email')
     username = models.CharField(max_length=150, unique=True,
-                                validators=[UnicodeUsernameValidator],
+                                validators=[UnicodeUsernameValidator,
+                                            validate_me],
                                 verbose_name='User name')
     first_name = models.CharField(max_length=150,
                                   verbose_name='Name')

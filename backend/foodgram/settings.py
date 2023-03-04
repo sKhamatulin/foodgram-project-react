@@ -1,16 +1,11 @@
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'jww041xs&h5r0qq9hnh@z6bsc_dl1%a_k25t24n_+j2f7%954w'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -18,8 +13,6 @@ ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -71,9 +64,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 
 DATABASES = {
     'default': {
@@ -87,8 +77,7 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -143,8 +132,6 @@ DJOSER = {
     'USER_ID_FIELD': 'id',
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -155,9 +142,6 @@ USE_I18N = True
 USE_L10N = True
 
 # USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/back_static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'back_static/')

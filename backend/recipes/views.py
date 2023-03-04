@@ -1,14 +1,15 @@
-from api.filters import IngredFilter, RecipeFilter
-from api.paginations import LimitPagination
-from api.permissions import IsAuthorOrReadOnly
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.db.models import F, Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from api.filters import IngredFilter, RecipeFilter
+from api.paginations import LimitPagination
+from api.permissions import IsAuthorOrReadOnly
 from .models import (Favorite, Ingredient, IngredInRecipe, Recipe,
                      ShoppingList, Tag)
 from .serializers import (FavoriteSerializer, GetRecipeSerializer,
@@ -101,7 +102,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             user=user, recipe=recipe
         )
         if request.method == 'DELETE':
-            if shoplist.exists():
+            if not shoplist.exists():
                 data = {'errors': 'Shoplist list hasn\'t this recipe'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
             shoplist.delete()
@@ -110,26 +111,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False,
             permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
+        shopping_list = []
         user = request.user
-        shopping_list = {}
-        ingredients = IngredInRecipe.objects.filter(
-            recipe__list__user=user).values_list(
-                'ingredient__name',
-                'amount',
-                'ingredient__measurement_unit',
-                named=True)
-        for ingredient in ingredients:
-            name = ingredient.ingredient__name
-            measurement_unit = ingredient.ingredient__measurement_unit
-            amount = ingredient.amount
-            if name not in shopping_list:
-                shopping_list[name] = {'amount': amount,
-                                       'measurement_unit': measurement_unit}
-            else:
-                shopping_list[name]['amount'] += amount
-        text = '\n'.join([
-            f"{key} {str(value['amount'])} - {value['measurement_unit']} "
-            for key, value in shopping_list.items()])
+        ingredients = Ingredient.objects.filter(
+            recipe__list__user=user).values(
+            'name',
+            measurement=F('measurement_unit')
+            ).annotate(total=Sum('ingredinrecipe__amount'))
+        for _ in ingredients:
+            shopping_list.append(
+                f'{_["name"]}: {_["total"]} {_["measurement"]}'
+            )
+        text = '\n'.join(shopping_list)
         filname = 'shoplist.txt'
         response = HttpResponse(text, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filname}'
