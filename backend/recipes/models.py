@@ -62,7 +62,7 @@ class Recipe(models.Model):
     )
     image = models.ImageField(
         verbose_name='Image',
-        upload_to='recipes/media/',
+        upload_to='foodgram/media/',
     )
     text = models.TextField(
         verbose_name='Discription',
