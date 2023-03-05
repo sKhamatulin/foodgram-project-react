@@ -8,8 +8,6 @@ from users.models import Follow
 User = get_user_model()
 
 
-
-
 class CustomUsersCreateSerializer(UserCreateSerializer):
     class Meta:
         fields = ('email', 'id', 'username', 'first_name', 'last_name',

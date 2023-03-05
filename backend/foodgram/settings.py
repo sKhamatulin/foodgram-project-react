@@ -63,8 +63,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -123,7 +121,7 @@ DJOSER = {
         'current_user': 'users.serializers.CustomUsersSerializer',
     },
     'PERMISSIONS': {
-        'user': ['api.permissions.AuthenticatedOrReadOnly'],
+        'user': ['rest_framework.permissions.IsAuthenticated'],
         'user_list': ['rest_framework.permissions.AllowAny'],
         'user_delete': ['rest_framework.permissions.IsAdminUser'],
     },
@@ -131,7 +129,6 @@ DJOSER = {
     'HIDE_USERS': False,
     'USER_ID_FIELD': 'id',
 }
-
 
 LANGUAGE_CODE = 'en-us'
 
@@ -143,10 +140,10 @@ USE_L10N = True
 
 # USE_TZ = True
 
-STATIC_URL = '/back_static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'back_static/')
 
-MEDIA_URL = '/back_media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'back_media/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

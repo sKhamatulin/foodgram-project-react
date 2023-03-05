@@ -1,9 +1,11 @@
 from django.db import migrations
-from foodgram import settings
 import json
+from pathlib import Path
+import os
 
-
-with open(f'{settings.BASE_DIR}/recipes/ingredients.json') as json_file:
+path = Path(__file__).resolve().parent.parent.parent.parent
+file = os.path.join(path, 'data', 'ingredients.json')
+with open(file) as json_file:
     INITIAL_INGREDIENTS = json.load(json_file)
 
 

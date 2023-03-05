@@ -1,13 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from recipes.serializers import FollowSerializer
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,)
 from rest_framework.response import Response
-from users.models import Follow
 
+from recipes.serializers import FollowSerializer
+from users.models import Follow
 from .serializers import CustomUsersSerializer
 
 User = get_user_model()
@@ -30,7 +30,7 @@ class UsersViewSet(UserViewSet):
         return self.get_paginated_response(serializer.data)
 
     @action(
-        methods=['get', 'delete'],
+        methods=['post', 'delete'],
         detail=True,
         permission_classes=(IsAuthenticated, )
     )
@@ -39,7 +39,7 @@ class UsersViewSet(UserViewSet):
         user = request.user
         check_subscribe = Follow.objects.filter(
             user=user, author=author).exists()
-        if request.method == 'GET':
+        if request.method == 'POST':
             if check_subscribe or user == author:
                 return Response({
                     'errors': ('You have already subscribed')
@@ -55,4 +55,3 @@ class UsersViewSet(UserViewSet):
         return Response({
             'errors': 'You are not subscribed to this user'
         }, status=status.HTTP_400_BAD_REQUEST)
-

@@ -1,13 +1,11 @@
 from drf_extra_fields.fields import Base64ImageField
-
-from recipes.models import (Favorite, Ingredient, IngredInRecipe, Recipe,
-                            ShoppingList, Tag)
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from users.models import Follow
 from users.serializers import CustomUsersSerializer
+from recipes.models import (Favorite, Ingredient, IngredInRecipe, Recipe,
+                            ShoppingList, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -54,7 +52,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
-        if request.user.is_anonymous:
+        if request is None or request.user.is_anonymous:
             return False
         return Favorite.objects.filter(user=request.user, recipe=obj).exists()
 
@@ -141,11 +139,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 'cooking time must be greater than one')
         return data
 
-    def get_ingredients(self, ingredients, recipe):
+    def add_recipe_ingredient(self, ingredients, recipe):
         IngredInRecipe.objects.bulk_create(
             IngredInRecipe(
                 recipe=recipe,
-                ingredient=ingredient.get('ingredient'),
+                ingredient_id=ingredient.get('id'),
                 amount=ingredient.get('amount')
             ) for ingredient in ingredients)
 
@@ -214,7 +212,7 @@ class FollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = (
-            'email', 'id', 'user_name', 'first_name', 'last_name',
+            'email', 'id', 'username', 'first_name', 'last_name',
             'is_subscribed', 'recipes', 'recipes_count'
         )
 

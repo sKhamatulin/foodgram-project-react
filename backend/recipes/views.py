@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from api.filters import IngredFilter, RecipeFilter
 from api.paginations import LimitPagination
 from api.permissions import IsAuthorOrReadOnly
-from .models import (Favorite, Ingredient, IngredInRecipe, Recipe,
+from .models import (Favorite, Ingredient, Recipe,
                      ShoppingList, Tag)
 from .serializers import (FavoriteSerializer, GetRecipeSerializer,
                           IngredientSerializer, RecipeCreateSerializer,
@@ -78,11 +78,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = FavoriteSerializer(favorite,
                                             context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        fovorlist = Favorite.objects.filter(user=user, recipe=recipe)
         if request.method == 'DELETE':
-            if Favorite.objects.filter(user=user, recipe=recipe).exists():
+            if not fovorlist.exists():
                 data = {'errors': 'Favorite list hasn\'t this recipe'}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-            Favorite.objects.filter(user=user, recipe=recipe).delete()
+            fovorlist.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['post', 'delete'], detail=True,
