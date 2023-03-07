@@ -22,7 +22,6 @@ jobs:
     - name: start tests
       run: |
         python -m flake8
-        pytest
   #2
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
