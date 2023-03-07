@@ -118,7 +118,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__list__user=user).values(
             'name',
             measurement=F('measurement_unit')
-            ).annotate(total=Sum('ingredinrecipe__amount'))
+        ).annotate(total=Sum('ingredinrecipe__amount'))
         for _ in ingredients:
             shopping_list.append(
                 f'{_["name"]}: {_["total"]} {_["measurement"]}'
