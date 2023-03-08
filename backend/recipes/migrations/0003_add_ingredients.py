@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import os
 
-path = Path(__file__).resolve().parent.parent.parent.parent
+path = Path(__file__).resolve().parent.parent.parent
 file = os.path.join(path, 'data', 'ingredients.json')
 with open(file) as json_file:
     INITIAL_INGREDIENTS = json.load(json_file)
