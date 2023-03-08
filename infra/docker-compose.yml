@@ -21,7 +21,7 @@ services:
         - ./.env
 
   frontend:
-    image: 64286/foodgram_frontend:v1
+    image: skhamatulin/foodgram-frontend:v1.0.0
     volumes:
       - ../frontend/:/app/result_build/
     
