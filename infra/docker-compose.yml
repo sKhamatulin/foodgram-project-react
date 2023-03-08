@@ -21,12 +21,9 @@ services:
         - ./.env
 
   frontend:
-    build:
-      image: skhamatulin/foodgram-frontend:v1.0.0
+    image: 64286/foodgram_frontend:v1
     volumes:
       - ../frontend/:/app/result_build/
-    depends_on:
-      - db
     
   nginx:
     image: nginx:1.19.3
