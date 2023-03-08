@@ -1,1 +1,1 @@
-![status badge](https://github.com/nonwander/foodgram-project-react/actions/workflows/main.yml/badge.svg)
+![status badge](https://github.com/skhamatulin/foodgram-project-react/actions/workflows/main.yml/badge.svg)
