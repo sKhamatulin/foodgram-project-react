@@ -82,6 +82,7 @@ jobs:
           script: |
             cd infra
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:v1.0.0
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-frontend:v1.0.0
             sudo docker-compose stop
             sudo docker-compose rm backend
             sudo rm .env
