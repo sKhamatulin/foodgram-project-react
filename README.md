@@ -42,20 +42,17 @@ docker-compose up -d --build
 ```
 
 4) Сделать миграции, собрать статику и создать суперпользователя:
-```
-docker-compose exec -T web python manage.py makemigrations users
-docker-compose exec -T web python manage.py makemigrations recipes
-docker-compose exec -T web python manage.py migrate
-docker-compose exec -T web python manage.py collectstatic --no-input
-docker-compose exec web python manage.py createsuperuser
-```
-
-5) Заполнить БД тестовыми записями:
 открыть bash
 ```
 docker-compose exec backend bush
 ```
-выгрузить данные из дампа
+python manage.py makemigrations users
+python manage.py makemigrations recipes
+python manage.py migrate
+python manage.py collectstatic --no-input
+python manage.py createsuperuser
+```
+5) Заполнить БД тестовыми записями:
 ```
 python manage.py loaddata fixtures.json
 ```
