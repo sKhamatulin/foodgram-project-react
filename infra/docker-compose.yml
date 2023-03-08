@@ -10,15 +10,15 @@ services:
       - ./.env
   
   backend:
-      image: skhamatulin/foodgram-backend:v1.0.0
-      restart: always
-      volumes: 
-        - static_value:/app/static/
-        - media_value:/app/media/
-      depends_on:
-        - db
-      env_file:
-        - ./.env
+    image: skhamatulin/foodgram-backend:v1.0.0
+    restart: always
+    volumes: 
+      - static_value:/app/static/
+      - media_value:/app/media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
 
   frontend:
     image: skhamatulin/foodgram-frontend:v1.0.0
