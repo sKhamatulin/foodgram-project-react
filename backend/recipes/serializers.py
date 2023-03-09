@@ -157,19 +157,25 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
+        ingredients = self.initial_data.get('ingredients')
+        if ingredients is not None:
+            IngredInRecipe.objects.filter(recipe=instance).delete()
+            self.add_recipe_ingredient(ingredients=ingredients,
+                                       recipe=instance)
+
+        tags = self.initial_data.get('tags')
+        if tags is not None:
+            instance.tags.clear()
+            instance.tags.set(tags)
+
+        instance.cooking_time = validated_data.get('cooking_time',
+                                                   instance.cooking_time)
         instance.image = validated_data.get('image', instance.image)
         instance.name = validated_data.get('name', instance.name)
         instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
-        instance.tags.clear()
-        tags = self.initial_data.get('tags')
-        instance.tags.set(tags)
-        ingredients = self.initial_data.get('ingredients')
-        IngredInRecipe.objects.filter(recipe=instance).delete()
-        self.add_recipe_ingredient(ingredients, instance)
+
         instance.save()
+
         return instance
 
     def get_is_favorited(self, obj):
