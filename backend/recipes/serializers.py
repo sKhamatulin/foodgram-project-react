@@ -166,14 +166,17 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.tags.clear()
         tags = self.initial_data.get('tags')
         instance.tags.set(tags)
-        ingredients = self.initial_data.get('ingredients')
         IngredInRecipe.objects.filter(recipe=instance).delete()
-        self.add_recipe_ingredient(ingredients, instance)
-        # ingredients = self.initial_data.get('ingredients')
-        # if ingredients is not None:
-        #     IngredInRecipe.objects.filter(recipe=instance).delete()
-        #     self.add_recipe_ingredient(ingredients=ingredients,
-        #                                recipe=instance)
+        ingredients = self.initial_data.get('ingredients')
+        IngredInRecipe.objects.bulk_create(
+            IngredInRecipe(
+                recipe=instance,
+                ingredient=Ingredient.objects.get(
+                    id=ingredient.get('ingredient')
+                ),
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients
+        )
         instance.save()
         return instance
 
