@@ -172,7 +172,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         if ingredients is not None:
             IngredInRecipe.objects.filter(recipe=instance).delete()
-            self.add_recipe_ingredient(ingredients=ingredients, recipe=instance)
+            self.add_recipe_ingredient(ingredients=ingredients,
+                                       recipe=instance)
         instance.save()
         return instance
 
