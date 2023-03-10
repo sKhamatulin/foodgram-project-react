@@ -21,7 +21,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredInRecipeSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
@@ -119,7 +119,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             if int(ingredient.get('amount')) <= 0:
                 raise serializers.ValidationError(
                     'Amount of ingredient must be greater than zero!')
-            ingredients_id_list.append(ingredient['id'])
+            ingredients_id_list.append(ingredient.get('ingredient')['id'])
         unique_ingredients = set(ingredients_id_list)
         if len(ingredients_id_list) > len(unique_ingredients):
             raise serializers.ValidationError(
@@ -139,17 +139,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 'cooking time must be greater than one')
         return data
 
-    # def add_recipe_ingredient(self, ingredients, recipe):
-    #     IngredInRecipe.objects.bulk_create(
-    #         IngredInRecipe(
-    #             amount=int(ingredient['amount']),
-    #             ingredient_id=int(ingredient['id']),
-    #             recipe=recipe
-    #         ) for ingredient in ingredients)
     def add_recipe_ingredient(self, ingredients, recipe):
         for ingredient in ingredients:
             IngredInRecipe.objects.create(
-                ingredient_id=ingredient.get('id'),
+                ingredient_id=ingredient.get('ingredient')['id'],
                 recipe=recipe,
                 amount=ingredient.get('amount'),
             )
