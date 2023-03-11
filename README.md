@@ -46,6 +46,7 @@ docker-compose up -d --build
 ```
 docker-compose exec backend bush
 ```
+```
 python manage.py makemigrations users
 python manage.py makemigrations recipes
 python manage.py migrate
